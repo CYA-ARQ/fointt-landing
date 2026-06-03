@@ -1,3 +1,4 @@
+import { assetPath } from "../assetPath";
 import Navbar from "./Navbar";
 
 function HeroStat({
@@ -53,8 +54,8 @@ export default function Hero() {
         loop
         muted
         playsInline
-        poster="/assets/fointt-hero-image.png"
-        src="/assets/fointt-hero-video.mp4"
+        poster={assetPath("assets/fointt-hero-image.png")}
+        src={assetPath("assets/fointt-hero-video.mp4")}
       />
       <div className="absolute inset-0 bg-black/45" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/60 to-transparent" />

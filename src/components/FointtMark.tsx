@@ -1,3 +1,5 @@
+import { assetPath } from "../assetPath";
+
 type FointtMarkProps = {
   className?: string;
   sizeClass?: string;
@@ -12,12 +14,12 @@ export default function FointtMark({
   const logo =
     variant === "icon"
       ? {
-          src: "/assets/fointt-logo-spiral.png",
+          src: assetPath("assets/fointt-logo-spiral.png"),
           alt: "fointt",
           defaultSize: "h-10 w-10",
         }
       : {
-          src: "/assets/fointt-logo-wordmark.png",
+          src: assetPath("assets/fointt-logo-wordmark.png"),
           alt: "fointt",
           defaultSize: "h-9 w-auto",
         };

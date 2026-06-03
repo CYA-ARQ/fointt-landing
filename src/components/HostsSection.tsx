@@ -1,4 +1,5 @@
 import { Building2 } from "lucide-react";
+import { assetPath } from "../assetPath";
 import ContactButtons from "./ContactButtons";
 
 export default function HostsSection() {
@@ -25,7 +26,7 @@ export default function HostsSection() {
 
           <div className="relative min-h-[280px] overflow-hidden rounded-[1.5rem] border border-white/10 bg-black">
             <img
-              src="/assets/fointt-picture2.png"
+              src={assetPath("assets/fointt-picture2.png")}
               alt="mockups de la app fointt para locales"
               className="absolute inset-0 h-full w-full object-cover object-left opacity-85"
             />

@@ -8,6 +8,7 @@ import {
   Search,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { assetPath } from "./assetPath";
 
 export type IconCard = {
   title: string;
@@ -46,21 +47,21 @@ export const steps: IconCard[] = [
 ];
 
 export const spaceTypes = [
-  { name: "previas", image: "/assets/explore/previas.png" },
-  { name: "post office", image: "/assets/explore/post-office.jpg" },
-  { name: "eventos", image: "/assets/explore/eventos.jpg" },
-  { name: "studios creativos", image: "/assets/explore/studios-creativos.jpg" },
-  { name: "fiestas", image: "/assets/explore/fiestas.jpg" },
-  { name: "pichangas", image: "/assets/explore/pichangas.jpeg" },
-  { name: "galas", image: "/assets/explore/galas.jpg" },
-  { name: "bodas", image: "/assets/explore/bodas.avif" },
-  { name: "restaurantes", image: "/assets/explore/restaurantes.jpg" },
-  { name: "cafeterías", image: "/assets/explore/cafeterias.jpg" },
-  { name: "rooftops", image: "/assets/explore/rooftops.jpg" },
-  { name: "salones", image: "/assets/explore/salones.jpg" },
-  { name: "canchas", image: "/assets/explore/canchas.jpg" },
-  { name: "terrazas", image: "/assets/explore/terrazas.jpg" },
-  { name: "espacios para reuniones", image: "/assets/explore/reuniones.jpg" },
+  { name: "previas", image: assetPath("assets/explore/previas.png") },
+  { name: "post office", image: assetPath("assets/explore/post-office.jpg") },
+  { name: "eventos", image: assetPath("assets/explore/eventos.jpg") },
+  { name: "studios creativos", image: assetPath("assets/explore/studios-creativos.jpg") },
+  { name: "fiestas", image: assetPath("assets/explore/fiestas.jpg") },
+  { name: "pichangas", image: assetPath("assets/explore/pichangas.jpeg") },
+  { name: "galas", image: assetPath("assets/explore/galas.jpg") },
+  { name: "bodas", image: assetPath("assets/explore/bodas.avif") },
+  { name: "restaurantes", image: assetPath("assets/explore/restaurantes.jpg") },
+  { name: "cafeterías", image: assetPath("assets/explore/cafeterias.jpg") },
+  { name: "rooftops", image: assetPath("assets/explore/rooftops.jpg") },
+  { name: "salones", image: assetPath("assets/explore/salones.jpg") },
+  { name: "canchas", image: assetPath("assets/explore/canchas.jpg") },
+  { name: "terrazas", image: assetPath("assets/explore/terrazas.jpg") },
+  { name: "espacios para reuniones", image: assetPath("assets/explore/reuniones.jpg") },
 ];
 
 export const formSpaceTypes = [
