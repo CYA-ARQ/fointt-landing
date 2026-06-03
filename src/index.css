@@ -1,0 +1,57 @@
+@import url("https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: #000;
+  }
+
+  body {
+    margin: 0;
+    background: #000;
+    color: #fff;
+    font-family: "Readex Pro", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  ::selection {
+    background: #fff;
+    color: #000;
+  }
+}
+
+@layer components {
+  .hero-title {
+    letter-spacing: 0;
+    line-height: 0.95;
+  }
+
+  .section-shell {
+    @apply mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 md:py-28 lg:px-10;
+  }
+
+  .eyebrow {
+    @apply mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-normal lowercase text-white/70 backdrop-blur;
+  }
+
+  .glass-card {
+    @apply border border-white/10 bg-neutral-900/70 backdrop-blur-xl shadow-soft;
+  }
+
+  .field {
+    @apply w-full border border-white/10 bg-black/40 px-5 py-4 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-white/40;
+  }
+}
