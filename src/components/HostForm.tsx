@@ -1,13 +1,117 @@
 import { FormEvent, useState } from "react";
 import { Check, ImagePlus, Send } from "lucide-react";
-import { formSpaceTypes, PHONE_DISPLAY } from "../content";
+import { formSpaceTypes, PHONE_DISPLAY, PHONE_TEL } from "../content";
 import ContactButtons from "./ContactButtons";
+
+type EventLead = {
+  nombre: string;
+  evento: string;
+  tipos: string;
+  ubicacion: string;
+  fecha: string;
+  personas: string;
+  presupuesto: string;
+  descripcion: string;
+  whatsapp: string;
+  referencias: string;
+  registrado: string;
+};
+
+const OWNER_WHATSAPP = PHONE_TEL.replace(/\D/g, "");
+
+function cleanFilename(value: string) {
+  const clean = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+
+  return clean || "evento";
+}
+
+async function buildLeadPdf(lead: EventLead) {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF();
+  const margin = 18;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const maxWidth = pageWidth - margin * 2;
+  let y = 22;
+
+  const addSection = (label: string, value: string) => {
+    if (y > 265) {
+      doc.addPage();
+      y = 22;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(label, margin, y);
+    y += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(value || "No indicado", maxWidth);
+    doc.text(lines, margin, y);
+    y += lines.length * 6 + 5;
+  };
+
+  doc.setFillColor(0, 0, 0);
+  doc.rect(0, 0, pageWidth, 42, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text("Nuevo registro FOINTT", margin, 24);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(lead.registrado, margin, 32);
+
+  doc.setTextColor(0, 0, 0);
+  y = 56;
+  addSection("Nombre completo", lead.nombre);
+  addSection("Nombre del evento", lead.evento);
+  addSection("Tipo de point", lead.tipos);
+  addSection("Zona o ciudad", lead.ubicacion);
+  addSection("Fecha tentativa", lead.fecha);
+  addSection("Cantidad de personas", lead.personas);
+  addSection("Presupuesto referencial", lead.presupuesto);
+  addSection("Numero de WhatsApp del usuario", lead.whatsapp);
+  addSection("Referencias adjuntas", lead.referencias);
+  addSection("Detalles del plan", lead.descripcion);
+
+  const filename = `fointt-${cleanFilename(lead.evento)}-${Date.now()}.pdf`;
+  doc.save(filename);
+  return filename;
+}
+
+function buildWhatsAppUrl(lead: EventLead, filename: string) {
+  const message = [
+    "Hola fointt, nuevo registro de evento.",
+    "",
+    `Nombre: ${lead.nombre}`,
+    `Evento: ${lead.evento}`,
+    `Tipo de point: ${lead.tipos}`,
+    `Zona: ${lead.ubicacion}`,
+    `Fecha: ${lead.fecha}`,
+    `Personas: ${lead.personas}`,
+    `Presupuesto: ${lead.presupuesto || "No indicado"}`,
+    `WhatsApp del usuario: ${lead.whatsapp}`,
+    "",
+    `Se genero el PDF: ${filename}`,
+    "Adjuntar el PDF descargado para enviarlo por este chat.",
+  ].join("\n");
+
+  return `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(message)}`;
+}
 
 export default function HostForm() {
   const [selected, setSelected] = useState<string[]>([]);
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedError, setSelectedError] = useState(false);
 
   const toggleType = (type: string) => {
+    setSelectedError(false);
     setSelected((current) => {
       if (current.includes(type)) {
         return current.filter((item) => item !== type);
@@ -21,9 +125,48 @@ export default function HostForm() {
     });
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSent(true);
+
+    if (selected.length === 0) {
+      setSelectedError(true);
+      return;
+    }
+
+    setSubmitting(true);
+    const formData = new FormData(event.currentTarget);
+    const fileInput = event.currentTarget.elements.namedItem("media") as HTMLInputElement | null;
+    const files = fileInput?.files ? Array.from(fileInput.files) : [];
+    const getValue = (name: string) => String(formData.get(name) ?? "").trim();
+    const lead: EventLead = {
+      nombre: getValue("nombre"),
+      evento: getValue("evento"),
+      tipos: selected.join(", "),
+      ubicacion: getValue("ubicacion"),
+      fecha: getValue("fecha"),
+      personas: getValue("personas"),
+      presupuesto: getValue("presupuesto"),
+      descripcion: getValue("descripcion"),
+      whatsapp: getValue("whatsapp"),
+      referencias: files.length
+        ? files.map((file) => file.name).join(", ")
+        : "Sin archivos adjuntos",
+      registrado: new Date().toLocaleString("es-PE", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    };
+
+    try {
+      const filename = await buildLeadPdf(lead);
+      const whatsappUrl = buildWhatsAppUrl(lead, filename);
+      window.setTimeout(() => {
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+      }, 300);
+      setSent(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -86,6 +229,11 @@ export default function HostForm() {
                 </span>
                 <span className="text-xs text-white/45">{selected.length}/3</span>
               </div>
+              {selectedError ? (
+                <p className="mb-3 text-sm text-white">
+                  elige al menos un tipo de point para generar el PDF.
+                </p>
+              ) : null}
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
                 {formSpaceTypes.map((type) => {
                   const active = selected.includes(type);
@@ -194,17 +342,18 @@ export default function HostForm() {
             </p>
             <button
               type="submit"
+              disabled={submitting}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-4 text-sm font-normal text-black transition hover:bg-neutral-200"
             >
-              enviar mi evento
+              {submitting ? "generando PDF" : "enviar mi evento"}
               <Send className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
 
           {sent ? (
             <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white/78">
-              evento recibido. te contactaremos por WhatsApp o llamada para
-              coordinar el siguiente paso.
+              PDF generado. Se abrio WhatsApp con el resumen del registro para
+              enviarlo a {PHONE_DISPLAY}; adjunta el PDF descargado en ese chat.
             </div>
           ) : null}
         </form>
