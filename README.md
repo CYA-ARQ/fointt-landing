@@ -2,6 +2,10 @@
 
 Landing page profesional para fointt construida con React, TypeScript, Vite y Tailwind CSS.
 
+## link publico
+
+https://cya-arq.github.io/fointt-landing/
+
 ## comandos
 
 ```bash
